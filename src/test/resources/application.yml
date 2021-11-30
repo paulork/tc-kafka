@@ -1,0 +1,31 @@
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/products
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: password
+    hikari:
+      connection-timeout: 20000
+      maximum-pool-size: 5
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQL10Dialect
+    hibernate:
+      ddl-auto: create
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+
+  kafka:
+    consumer:
+      auto-offset-reset: earliest
+      group-id: baeldung
+test:
+  topic: embedded-test-topic
+
+monitor:
+  kafka:
+    bootstrap:
+      config: "PLAINTEXT://localhost:9085"
+    consumer:
+      groupid: "baeldungGrp"
