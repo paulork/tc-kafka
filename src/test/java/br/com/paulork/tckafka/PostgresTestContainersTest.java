@@ -25,10 +25,7 @@ import java.util.List;
 public class PostgresTestContainersTest extends AbstractBaseTest {
 
     @Container
-    public static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(DockerImageName.parse("postgres:14"))
-            .withDatabaseName("products")
-            .withUsername("postgres")
-            .withPassword("password");
+    public static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(DockerImageName.parse("postgres:14"));
 
     @Autowired
     private ProductRepository repository;

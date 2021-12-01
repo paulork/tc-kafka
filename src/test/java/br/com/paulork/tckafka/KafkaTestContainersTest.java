@@ -32,10 +32,7 @@ public class KafkaTestContainersTest extends AbstractBaseTest {
     public static KafkaContainer kafka = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:6.2.0"));
 
     @Container
-    public static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(DockerImageName.parse("postgres:14"))
-            .withDatabaseName("products")
-            .withUsername("postgres")
-            .withPassword("password");
+    public static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(DockerImageName.parse("postgres:14"));
 
     @Autowired
     private KafkaConsumer consumer;
