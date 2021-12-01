@@ -5,7 +5,6 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,6 +22,8 @@ import org.testcontainers.utility.DockerImageName;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Import(KafkaTestContainersTest.KafkaTestContainersConfiguration.class)
 @ContextConfiguration(initializers = PostgresTestContainersTest.Initializer.class)
@@ -49,8 +50,8 @@ public class KafkaTestContainersTest extends AbstractBaseTest {
         producer.send(topic, "Sending with own controller");
         consumer.getLatch().await(10000, TimeUnit.MILLISECONDS);
 
-        Assertions.assertEquals(0L, consumer.getLatch().getCount());
-        Assertions.assertEquals("Sending with own controller", consumer.getPayload());
+        assertEquals(0L, consumer.getLatch().getCount());
+        assertEquals("Sending with own controller", consumer.getPayload(), "Payload content");
     }
 
     // CONFIGURATION CLASS

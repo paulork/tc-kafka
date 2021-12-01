@@ -2,7 +2,6 @@ package br.com.paulork.tckafka;
 
 import br.com.paulork.tckafka.domain.Product;
 import br.com.paulork.tckafka.domain.ProductRepository;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.util.TestPropertyValues;
@@ -20,6 +19,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ContextConfiguration(initializers = PostgresTestContainersTest.Initializer.class)
 public class PostgresTestContainersTest extends AbstractBaseTest {
@@ -37,7 +37,7 @@ public class PostgresTestContainersTest extends AbstractBaseTest {
     public void testIfTheDatabaseIsUp() throws SQLException {
         ResultSet resultSet = performQuery(postgres, "SELECT 1");
         int resultSetInt = resultSet.getInt(1);
-        Assertions.assertEquals(1, resultSetInt, "A basic SELECT query succeeds");
+        assertEquals(1, resultSetInt, "A basic SELECT query succeeds");
 
     }
 
@@ -49,12 +49,12 @@ public class PostgresTestContainersTest extends AbstractBaseTest {
         repository.save(product2);
 
         List<Product> all = repository.findAll();
-        Assertions.assertEquals(2, all.size(), "Number of records inserted");
+        assertEquals(2, all.size(), "Number of records inserted");
 
         Product find1 = repository.findById(1L).orElseThrow();
         Product find2 = repository.findById(2L).orElseThrow();
-        Assertions.assertEquals("Mochila", find1.getName(), "Product 1 name");
-        Assertions.assertEquals("Notebook", find2.getName(), "Product 2 name");
+        assertEquals("Mochila", find1.getName(), "Product 1 name");
+        assertEquals("Notebook", find2.getName(), "Product 2 name");
     }
 
     // HELPER FUNCTION

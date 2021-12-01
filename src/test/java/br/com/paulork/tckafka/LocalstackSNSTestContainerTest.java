@@ -1,6 +1,5 @@
 package br.com.paulork.tckafka;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.ContextConfiguration;
@@ -8,6 +7,8 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.localstack.LocalStackContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.utility.DockerImageName;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ContextConfiguration(initializers = PostgresTestContainersTest.Initializer.class)
 public class LocalstackSNSTestContainerTest extends AbstractBaseTest {
@@ -29,7 +30,7 @@ public class LocalstackSNSTestContainerTest extends AbstractBaseTest {
 
     @Test
     public void testeLocalstack() {
-        Assertions.assertTrue(localStack.isRunning());
+        assertTrue(localStack.isRunning(), "Localstack is running");
     }
 
 }
