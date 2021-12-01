@@ -4,14 +4,7 @@ import br.com.paulork.tckafka.domain.Product;
 import br.com.paulork.tckafka.domain.ProductRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.util.TestPropertyValues;
-import org.springframework.context.ApplicationContextInitializer;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.test.context.ContextConfiguration;
 import org.testcontainers.containers.JdbcDatabaseContainer;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.utility.DockerImageName;
 
 import javax.sql.DataSource;
 import java.sql.ResultSet;
@@ -21,11 +14,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@ContextConfiguration(initializers = PostgresTestContainersTest.Initializer.class)
 public class PostgresTestContainersTest extends AbstractBaseTest {
-
-    @Container
-    public static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(DockerImageName.parse("postgres:14"));
 
     @Autowired
     private ProductRepository repository;
@@ -65,20 +54,6 @@ public class PostgresTestContainersTest extends AbstractBaseTest {
 
         resultSet.next();
         return resultSet;
-    }
-
-    // CONTEXT CONFIG CLASS
-    public static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
-        @Override
-        public void initialize(ConfigurableApplicationContext configurableApplicationContext) {
-            postgres.start();
-            TestPropertyValues values = TestPropertyValues.of(
-                    "spring.datasource.url=" + postgres.getJdbcUrl(),
-                    "spring.datasource.password=" + postgres.getPassword(),
-                    "spring.datasource.username=" + postgres.getUsername()
-            );
-            values.applyTo(configurableApplicationContext);
-        }
     }
 
 }

@@ -1,7 +1,6 @@
 package br.com.paulork.tckafka.service;
 
 import br.com.paulork.tckafka.domain.ProductRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
