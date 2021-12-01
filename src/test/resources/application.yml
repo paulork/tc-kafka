@@ -1,7 +1,7 @@
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5433/products
+    url: jdbc:postgresql://localhost:5432/products
     driver-class-name: org.postgresql.Driver
     username: postgres
     password: password
@@ -19,13 +19,15 @@ spring:
   kafka:
     consumer:
       auto-offset-reset: earliest
-      group-id: baeldung
+      group-id: paulork
 test:
   topic: embedded-test-topic
+  aws:
+    region: "us-east-1"
 
 monitor:
   kafka:
     bootstrap:
       config: "PLAINTEXT://localhost:9085"
     consumer:
-      groupid: "baeldungGrp"
+      groupid: "paulork"

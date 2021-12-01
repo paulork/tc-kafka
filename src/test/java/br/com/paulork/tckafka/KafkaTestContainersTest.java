@@ -1,66 +1,62 @@
 package br.com.paulork.tckafka;
 
 import br.com.paulork.tckafka.kafka.KafkaConsumer;
-import br.com.paulork.tckafka.kafka.KafkaProducer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.*;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.ContextConfiguration;
 import org.testcontainers.containers.KafkaContainer;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.utility.DockerImageName;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
+@Import(KafkaTestContainersTest.KafkaTestContainersConfiguration.class)
+@ContextConfiguration(initializers = PostgresTestContainersTest.Initializer.class)
+public class KafkaTestContainersTest extends AbstractBaseTest {
 
-@RunWith(SpringRunner.class)
-@Import(br.com.paulork.tckafka.KafkaTestConteinersLiveTest.KafkaTestContainersConfiguration.class)
-@SpringBootTest(classes = TcKafkaApplication.class)
-@DirtiesContext
-public class KafkaTestConteinersLiveTest {
-
-    @ClassRule
+    @Container
     public static KafkaContainer kafka = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:6.2.0"));
+
+    @Container
+    public static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(DockerImageName.parse("postgres:14"))
+            .withDatabaseName("products")
+            .withUsername("postgres")
+            .withPassword("password");
 
     @Autowired
     private KafkaConsumer consumer;
 
     @Autowired
+    private KafkaTemplate<String, String> producer;
 //    private KafkaProducer producer;
-    private KafkaTemplate<String, String> kafkaTemplate;
 
     @Value("${test.topic}")
     private String topic;
 
     @Test
-    public void givenKafkaDockerContainer_whenSendingtoSimpleProducer_thenMessageReceived()
-            throws Exception {
-        kafkaTemplate.send(topic, "Sending with own controller");
+    public void givenKafkaDockerContainer_whenSendingtoSimpleProducer_thenMessageReceived() throws Exception {
+        producer.send(topic, "Sending with own controller");
         consumer.getLatch().await(10000, TimeUnit.MILLISECONDS);
 
-        assertThat(consumer.getLatch().getCount(), equalTo(0L));
-        assertThat(consumer.getPayload(), containsString("embedded-test-topic"));
+        Assertions.assertEquals(0L, consumer.getLatch().getCount());
+        Assertions.assertEquals("Sending with own controller", consumer.getPayload());
     }
 
-
-    // CONFIGURATION ----------------------
+    // CONFIGURATION CLASS
     @TestConfiguration
     static class KafkaTestContainersConfiguration {
 
@@ -81,7 +77,7 @@ public class KafkaTestConteinersLiveTest {
             Map<String, Object> props = new HashMap<>();
             props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafka.getBootstrapServers());
             props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-            props.put(ConsumerConfig.GROUP_ID_CONFIG, "baeldung");
+            props.put(ConsumerConfig.GROUP_ID_CONFIG, "paulork");
             props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
             props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
             return props;

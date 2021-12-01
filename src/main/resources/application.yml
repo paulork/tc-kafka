@@ -15,10 +15,10 @@ spring:
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
 
-#  kafka:
-#    consumer:
-#      auto-offset-reset: earliest
-#      group-id: baeldung
-#
-#test:
-#  topic: embedded-test-topic
+  kafka:
+    consumer:
+      auto-offset-reset: earliest
+      group-id: paulork
+
+test:
+  topic: embedded-test-topic

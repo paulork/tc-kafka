@@ -17,9 +17,9 @@ public class KafkaConsumer {
     private String payload = null;
 
     @KafkaListener(topics = "${test.topic}")
-    public void receive(ConsumerRecord<?, ?> consumerRecord) {
-        LOGGER.info("received payload='{}'", consumerRecord.toString());
-        setPayload(consumerRecord.toString());
+    public void receive(ConsumerRecord<String, String> consumerRecord) {
+        LOGGER.info("received payload='{}'", consumerRecord.value());
+        setPayload(consumerRecord.value());
         latch.countDown();
     }
 
