@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 import org.testcontainers.containers.localstack.LocalStackContainer;
+import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.utility.DockerImageName;
 
@@ -27,10 +28,15 @@ public class LocalstackSNSTestContainerTest extends AbstractBaseTest {
     public static LocalStackContainer localStack = new LocalStackContainer(DockerImageName
             .parse("localstack/localstack:0.11.3"))
             .withServices(LocalStackContainer.Service.SNS, LocalStackContainer.Service.SQS)
-            .withEnv("DEFAULT_REGION", region);
+            .withEnv("DEFAULT_REGION", region)
+            .withExposedPorts(4566)
+            .withReuse(true)
+            .waitingFor(
+                    Wait.forLogMessage(".*Ready.*\\n", 1)
+            );
 
     @BeforeAll
-    public static void runBefore(){
+    public static void runBefore() {
         sns = AmazonSNSClientBuilder.standard()
                 .withEndpointConfiguration(localStack.getEndpointConfiguration(LocalStackContainer.Service.SNS))
                 .withCredentials(localStack.getDefaultCredentialsProvider())
@@ -46,10 +52,21 @@ public class LocalstackSNSTestContainerTest extends AbstractBaseTest {
         sqs.createQueue("sqs-tertiary");
 
         SubscribeRequest sns_sr = new SubscribeRequest();
-        sns_sr.setEndpoint(localStack.getHost());
+        sns_sr.setEndpoint("http://"+localStack.getHost()+":"+localStack.getMappedPort(4566).toString());
+        sns_sr.setEndpoint("http://"+localStack.getHost()+":"+localStack.getFirstMappedPort().toString());
         sns_sr.setTopicArn("arn:aws:sns:us-east-1:000000000000:local_sns");
-        sns_sr.setProtocol("sns");
+        sns_sr.setProtocol("sqs");
         sns.subscribe(sns_sr);
+
+        sns = AmazonSNSClientBuilder.standard()
+                .withEndpointConfiguration(localStack.getEndpointConfiguration(LocalStackContainer.Service.SNS))
+                .withCredentials(localStack.getDefaultCredentialsProvider())
+                .build();
+
+        sqs = AmazonSQSClientBuilder.standard()
+                .withEndpointConfiguration(localStack.getEndpointConfiguration(LocalStackContainer.Service.SQS))
+                .withCredentials(localStack.getDefaultCredentialsProvider())
+                .build();
     }
 
     @Test
@@ -59,9 +76,12 @@ public class LocalstackSNSTestContainerTest extends AbstractBaseTest {
 
     @Test
     public void testIfSQSQueusExists() {
-        String primary = "http://" + localStack.getHost() + ":" + localStack.getFirstMappedPort() + "/000000000000/sqs-primary";
-        String secondary = "http://" + localStack.getHost() + ":" + localStack.getFirstMappedPort() + "/000000000000/sqs-secondary";
-        String tertiary = "http://" + localStack.getHost() + ":" + localStack.getFirstMappedPort() + "/000000000000/sqs-tertiary";
+        String port = localStack.getMappedPort(4566).toString();
+        String host = localStack.getHost();
+
+        String primary = "http://" + host + ":" + port + "/000000000000/sqs-primary";
+        String secondary = "http://" + host + ":" + port + "/000000000000/sqs-secondary";
+        String tertiary = "http://" + host + ":" + port + "/000000000000/sqs-tertiary";
 
         assertEquals(3, sqs.listQueues().getQueueUrls().size(), "Number of SQS queue's");
         assertEquals(primary, sqs.getQueueUrl("sqs-primary").getQueueUrl(), "Primary SQS queue");
@@ -78,9 +98,12 @@ public class LocalstackSNSTestContainerTest extends AbstractBaseTest {
 
     @Test
     public void testIfSNStoSQSSubscriptionExists() {
-        assertEquals(1, sns.listSubscriptions().getSubscriptions().size(), "Number of SNS subscriptions");
+        assertEquals(1, sns.listSubscriptions()
+                .getSubscriptions().size(), "Number of SNS subscriptions");
         assertEquals("arn:aws:sns:us-east-1:000000000000:local_sns",
-                sns.listSubscriptions().getSubscriptions().get(0).getTopicArn(), "SNS subscription topic");
+                sns.listSubscriptions()
+                        .getSubscriptions()
+                        .get(0).getTopicArn(), "SNS subscription topic");
     }
 
 }

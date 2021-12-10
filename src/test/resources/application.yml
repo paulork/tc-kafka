@@ -1,4 +1,12 @@
 
+cloud:
+  aws:
+    region:
+      static: "us-east-1"
+    sns:
+      uri: "http://localhost:4566"
+      topic: "queue_sns"
+
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/products
@@ -26,10 +34,8 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
-test:
+kafka:
   topic: embedded-test-topic
-  aws:
-    region: "us-east-1"
 
 monitor:
   kafka:

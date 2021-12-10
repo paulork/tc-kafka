@@ -1,5 +1,6 @@
-package br.com.paulork.tckafka.domain;
+package br.com.paulork.tckafka.domain.repositories;
 
+import br.com.paulork.tckafka.domain.entity.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

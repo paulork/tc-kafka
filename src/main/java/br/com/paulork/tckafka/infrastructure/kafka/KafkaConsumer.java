@@ -1,4 +1,4 @@
-package br.com.paulork.tckafka.kafka;
+package br.com.paulork.tckafka.infrastructure.kafka;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.slf4j.Logger;
@@ -6,25 +6,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
-import java.util.concurrent.CountDownLatch;
-
 @Component
 public class KafkaConsumer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(KafkaConsumer.class);
 
-    private final CountDownLatch latch = new CountDownLatch(1);
     private String payload = null;
 
-    @KafkaListener(topics = "${test.topic}")
+    @KafkaListener(topics = "${kafka.topic}")
     public void receive(ConsumerRecord<String, String> consumerRecord) {
         LOGGER.info("received payload='{}'", consumerRecord.value());
         setPayload(consumerRecord.value());
-        latch.countDown();
-    }
-
-    public CountDownLatch getLatch() {
-        return latch;
     }
 
     public String getPayload() {

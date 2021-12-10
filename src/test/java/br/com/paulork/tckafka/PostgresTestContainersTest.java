@@ -1,7 +1,7 @@
 package br.com.paulork.tckafka;
 
-import br.com.paulork.tckafka.domain.Product;
-import br.com.paulork.tckafka.domain.ProductRepository;
+import br.com.paulork.tckafka.domain.entity.Product;
+import br.com.paulork.tckafka.domain.repositories.ProductRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.testcontainers.containers.JdbcDatabaseContainer;
@@ -27,11 +27,10 @@ public class PostgresTestContainersTest extends AbstractBaseTest {
         ResultSet resultSet = performQuery(postgres, "SELECT 1");
         int resultSetInt = resultSet.getInt(1);
         assertEquals(1, resultSetInt, "A basic SELECT query succeeds");
-
     }
 
     @Test
-    public void testInsertProductsInDatabase() throws InterruptedException {
+    public void testInsertProductsInDatabase() {
         Product product1 = new Product("Mochila", 120.0);
         Product product2 = new Product("Notebook", 2500.0);
         repository.save(product1);

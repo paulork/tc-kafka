@@ -8,6 +8,7 @@ import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.lifecycle.Startables;
 import org.testcontainers.utility.DockerImageName;
 
 @Testcontainers
@@ -25,6 +26,8 @@ abstract class AbstractBaseTest {
 
     @DynamicPropertySource
     static void datasourceConfig(DynamicPropertyRegistry registry) {
+        Startables.deepStart(kafka, postgres);
+
         registry.add("spring.datasource.url", postgres::getJdbcUrl);
         registry.add("spring.datasource.password", postgres::getPassword);
         registry.add("spring.datasource.username", postgres::getUsername);
