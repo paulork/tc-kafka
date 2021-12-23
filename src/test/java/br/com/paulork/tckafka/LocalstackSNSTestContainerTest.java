@@ -2,6 +2,7 @@ package br.com.paulork.tckafka;
 
 import com.amazonaws.services.sns.AmazonSNS;
 import com.amazonaws.services.sns.AmazonSNSClientBuilder;
+import com.amazonaws.services.sns.model.CreateTopicResult;
 import com.amazonaws.services.sns.model.SubscribeRequest;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
@@ -41,7 +42,7 @@ public class LocalstackSNSTestContainerTest extends AbstractBaseTest {
                 .withEndpointConfiguration(localStack.getEndpointConfiguration(LocalStackContainer.Service.SNS))
                 .withCredentials(localStack.getDefaultCredentialsProvider())
                 .build();
-        sns.createTopic("local_sns");
+        CreateTopicResult snsResult = sns.createTopic("local_sns");
 
         sqs = AmazonSQSClientBuilder.standard()
                 .withEndpointConfiguration(localStack.getEndpointConfiguration(LocalStackContainer.Service.SQS))
@@ -53,8 +54,7 @@ public class LocalstackSNSTestContainerTest extends AbstractBaseTest {
 
         SubscribeRequest sns_sr = new SubscribeRequest();
         sns_sr.setEndpoint("http://"+localStack.getHost()+":"+localStack.getMappedPort(4566).toString());
-        sns_sr.setEndpoint("http://"+localStack.getHost()+":"+localStack.getFirstMappedPort().toString());
-        sns_sr.setTopicArn("arn:aws:sns:us-east-1:000000000000:local_sns");
+        sns_sr.setTopicArn(snsResult.getTopicArn());
         sns_sr.setProtocol("sqs");
         sns.subscribe(sns_sr);
 
