@@ -1,4 +1,4 @@
-# tc-kafka: Testcontainers Demonstration Project
+# Testcontainers Demonstration Project
 
 This project demonstrates the capabilities of Testcontainers for creating reliable integration tests in a Java Spring Boot application. It showcases how to integrate with various services like Kafka, PostgreSQL, AWS SNS/SQS (via LocalStack), and Redis, ensuring that tests run against real service instances managed by Docker.
 
